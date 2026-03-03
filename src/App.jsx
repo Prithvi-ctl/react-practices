@@ -1,4 +1,6 @@
 import { useState } from "react";
+import bombs from "../src/assets/bombs.png"
+
 
 function createBoard(rows, cols) {
   return Array.from({ length: rows }, () =>
@@ -11,7 +13,8 @@ function createBoard(rows, cols) {
   );
 }
 function RevealEmptyCells(board,r,c,rows,cols){
-  const newBoard = board;
+  const newBoard = board.map(row => row.map(cell=> ({...cell}))
+);
 
    const directions = [
   [-1,-1], [-1,0], [-1,1],
@@ -38,7 +41,7 @@ function dfs(x,y){
 }
 dfs(r,c);
 
-return[...newBoard];
+return newBoard;
 }
 function countNeighbours(board,rows,cols){
   const directions = [
@@ -114,19 +117,21 @@ function Board({ mineCount = 10 }) {
 }
 
   return (
-    <div className="grid grid-cols-8 gap-1">
+    <div className="inline-block border-4 border-gray-600">
+    <div className="grid grid-cols-8 divide-x divide-y divide-black">
       {board.map((row, r) =>
         row.map((cell, c) => (
           <div
             key={`${r}-${c}`}
             onClick={() => HandleClicking(r, c)}
-            className={`w-10 h-10 border border-black cursor-pointer
+            className={`w-20 h-20 cursor-pointer
               ${cell.isRevealed ? "bg-gray-400" : "bg-red-200"}`}
           >
-            {cell.neighbourMines}          </div>
+          {cell.isRevealed && (cell.isMine?<img src={bombs} alt="bmb"/>:cell.neighbourMines)}         </div>
         ))
       )}
       
+    </div>
     </div>
   );
 }
