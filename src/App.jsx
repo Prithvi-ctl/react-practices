@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
+
 import bombs from "../src/assets/bombs.png"
 
 
@@ -93,9 +94,8 @@ function PlaceMines(board, rows, cols, mineCount) {
   return newBoard;
 }
 
-function Board({ mineCount = 10 }) {
-  const rows = 8;
-  const cols = 8;
+function Board({rows,cols,mineCount}) {
+
 
   const [board, setBoard] = useState(() => {
     let newBoard = createBoard(rows, cols);
@@ -104,10 +104,26 @@ function Board({ mineCount = 10 }) {
     return newBoard ;
   });
 
+  useEffect(() =>{
+    let newBoard = createBoard(rows,cols);
+    newBoard=PlaceMines(newBoard,rows,cols,mineCount);
+    newBoard=countNeighbours(newBoard,rows,cols);
+    setBoard(newBoard);
+  },[rows,cols,mineCount]);
+
   function HandleClicking(r, c) {
     const newBoard = board.map(row =>
       row.map(cell => ({ ...cell }))
     );
+
+    const cell = newBoard[r][c];
+
+    if(cell.isMine){
+      cell.isRevealed =true;
+      newBoard.forEach(row => row.forEach(c=>{
+        if(c.isMine) c.isRevealed = true;
+      })
+    );}
     if(newBoard[r][c].neighbourMines===0){
       setBoard(RevealEmptyCells(newBoard,r,c,rows,cols))
     }else{
@@ -117,8 +133,11 @@ function Board({ mineCount = 10 }) {
 }
 
   return (
+
+    <div className="flex justify-center items-center min-h-screen">
     <div className="inline-block border-4 border-gray-600">
-    <div className="grid grid-cols-8 divide-x divide-y divide-black">
+    <div className="grid divide-x divide-y divide-black font-black text-6xl"
+      style={{gridTemplateColumns: `repeat(${cols},1fr)`}}>
       {board.map((row, r) =>
         row.map((cell, c) => (
           <div
@@ -133,7 +152,51 @@ function Board({ mineCount = 10 }) {
       
     </div>
     </div>
+    </div>
   );
 }
 
-export default Board;
+function GenerateBoard(){
+  const [difficulty,setDifficulty] = useState({
+    rows:8,
+    cols:8,
+    mines:10
+  });
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-6">
+      {/*difficulty buttons */}
+      <div className="flex gap-4">
+        <button
+        className="px-4 py-2 bg-green-400"
+        onClick={()=>{
+          setDifficulty({rows:10,cols:10,mines:20})
+        }}>
+          Beginner
+        </button>
+        
+        <button
+        className="px-4 py-2 bg-yellow-400"
+        onClick={()=>{
+          setDifficulty({rows:15,cols:15,mines:50})
+        }}>
+          Intermediate
+        </button>
+
+        <button className="px-4 py-2 bg-red-400"
+        onClick={()=>{
+          setDifficulty({rows:20,cols:20,mines:100})
+        }}>Expert</button>
+      </div>
+
+      <Board
+        rows={difficulty.rows}
+        cols={difficulty.cols}
+        mineCount={difficulty.mines}/>
+
+    </div>
+  )
+
+}
+
+export default GenerateBoard;
