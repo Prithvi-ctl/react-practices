@@ -1,6 +1,8 @@
 import { useState,useEffect } from "react";
 
 import bombs from "../src/assets/bombs.png"
+import flags from "../src/assets/flag.png"
+
 
 
 function createBoard(rows, cols) {
@@ -101,6 +103,7 @@ function Board({rows,cols,mineCount}) {
     let newBoard = createBoard(rows, cols);
     newBoard = PlaceMines(newBoard, rows, cols, mineCount);
     newBoard = countNeighbours(newBoard,rows,cols);
+    
     return newBoard ;
   });
 
@@ -109,15 +112,26 @@ function Board({rows,cols,mineCount}) {
     newBoard=PlaceMines(newBoard,rows,cols,mineCount);
     newBoard=countNeighbours(newBoard,rows,cols);
     setBoard(newBoard);
-  },[rows,cols,mineCount]);
 
+  },[rows,cols,mineCount]);
+  function placeFlags(r,c){
+  const newBoard = board.map(row =>
+    row.map(cell => 
+    ({...cell})
+    )
+  );
+  if(newBoard[r][c].isRevealed) return;
+  newBoard[r][c].isFlagged = !newBoard[r][c].isFlagged;
+
+  setBoard(newBoard);
+}
   function HandleClicking(r, c) {
     const newBoard = board.map(row =>
       row.map(cell => ({ ...cell }))
     );
 
     const cell = newBoard[r][c];
-
+    if(cell.isFlagged) return;
     if(cell.isMine){
       cell.isRevealed =true;
       newBoard.forEach(row => row.forEach(c=>{
@@ -131,6 +145,16 @@ function Board({rows,cols,mineCount}) {
     setBoard(newBoard);
   }
 }
+function renderContent(cell){
+  if(cell.isRevealed){
+    if(cell.isMine) return <img src={bombs} alt="bomb"/>;
+    return cell.neighbourMines || "";
+  }
+  if(cell.isFlagged){
+    return <img src={flags} alt="flag"/>
+  }
+  return null;
+}
 
   return (
 
@@ -143,13 +167,18 @@ function Board({rows,cols,mineCount}) {
           <div
             key={`${r}-${c}`}
             onClick={() => HandleClicking(r, c)}
+            onContextMenu={(e)=>{
+  e.preventDefault();
+   placeFlags(r,c);
+}}
             className={`w-20 h-20 cursor-pointer
               ${cell.isRevealed ? "bg-gray-400" : "bg-red-200"}`}
           >
-          {cell.isRevealed && (cell.isMine?<img src={bombs} alt="bmb"/>:cell.neighbourMines)}         </div>
+        
+         {renderContent(cell)}
+                   </div>
         ))
       )}
-      
     </div>
     </div>
     </div>
@@ -196,7 +225,6 @@ function GenerateBoard(){
 
     </div>
   )
-
 }
 
 export default GenerateBoard;
