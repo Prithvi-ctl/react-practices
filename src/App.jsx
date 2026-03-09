@@ -1,10 +1,26 @@
 import { useState,useEffect } from "react";
+import {useRef} from "react";
 
 import bombs from "../src/assets/bombs.png"
 import flags from "../src/assets/flag.png"
+import faces from "../src/assets/all faces.png"
+import face0 from "../src/assets/faces/smile.png"
+import face1 from "../src/assets/faces/shocked.png"
+import face2 from"../src/assets/faces/lose.jpg"
+import face3 from "../src/assets/faces/win.png"
 
 
+function ImageMani({index}){
 
+  const expressions = [
+    face0,face1,face2,face3
+  ];
+return(
+<div className="border-1 border-grey-400">
+  <img src={expressions[index]} alt="face"/>
+</div>
+);
+}
 function createBoard(rows, cols) {
   return Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => ({
@@ -106,6 +122,8 @@ function Board({rows,cols,mineCount}) {
     
     return newBoard ;
   });
+  const timeoutRef = useRef(null);
+  const [face,setFace] = useState(0);
 
   useEffect(() =>{
     let newBoard = createBoard(rows,cols);
@@ -129,15 +147,19 @@ function Board({rows,cols,mineCount}) {
     const newBoard = board.map(row =>
       row.map(cell => ({ ...cell }))
     );
-
+    setFace(1);
+    timeoutRef.current = setTimeout(() => {setFace(0);},300);
     const cell = newBoard[r][c];
     if(cell.isFlagged) return;
     if(cell.isMine){
+      clearTimeout(timeoutRef.current);
+      setFace(2);
+      
       cell.isRevealed =true;
       newBoard.forEach(row => row.forEach(c=>{
         if(c.isMine) c.isRevealed = true;
       })
-    );}
+    );};
     if(newBoard[r][c].neighbourMines===0){
       setBoard(RevealEmptyCells(newBoard,r,c,rows,cols))
     }else{
@@ -157,13 +179,16 @@ function renderContent(cell){
 }
 
   return (
-
+    
     <div className="flex justify-center items-center min-h-screen">
+      <ImageMani index={face}/>
+      
     <div className="inline-block border-4 border-gray-600">
     <div className="grid divide-x divide-y divide-black font-black text-6xl"
       style={{gridTemplateColumns: `repeat(${cols},1fr)`}}>
       {board.map((row, r) =>
         row.map((cell, c) => (
+          
           <div
             key={`${r}-${c}`}
             onClick={() => HandleClicking(r, c)}
@@ -180,12 +205,13 @@ function renderContent(cell){
         ))
       )}
     </div>
-    </div>
+       </div>
     </div>
   );
 }
 
 function GenerateBoard(){
+  
   const [difficulty,setDifficulty] = useState({
     rows:8,
     cols:8,
@@ -194,37 +220,44 @@ function GenerateBoard(){
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-6">
-      {/*difficulty buttons */}
+
       <div className="flex gap-4">
         <button
-        className="px-4 py-2 bg-green-400"
-        onClick={()=>{
-          setDifficulty({rows:10,cols:10,mines:20})
-        }}>
+          className="px-4 py-2 bg-green-400"
+          onClick={()=>{
+            setDifficulty({rows:10,cols:10,mines:20})
+          }}>
           Beginner
         </button>
-        
+
         <button
-        className="px-4 py-2 bg-yellow-400"
-        onClick={()=>{
-          setDifficulty({rows:15,cols:15,mines:50})
-        }}>
+          className="px-4 py-2 bg-yellow-400"
+          onClick={()=>{
+            setDifficulty({rows:15,cols:15,mines:50})
+          }}>
           Intermediate
         </button>
 
-        <button className="px-4 py-2 bg-red-400"
-        onClick={()=>{
-          setDifficulty({rows:20,cols:20,mines:100})
-        }}>Expert</button>
+        <button
+          className="px-4 py-2 bg-red-400"
+          onClick={()=>{
+            setDifficulty({rows:20,cols:20,mines:100})
+          }}>
+          Expert
+        </button>
       </div>
 
-      <Board
-        rows={difficulty.rows}
-        cols={difficulty.cols}
-        mineCount={difficulty.mines}/>
+      <div className="border-4 border-gray-200 w-fit">
+        
+        <Board
+          rows={difficulty.rows}
+          cols={difficulty.cols}
+          mineCount={difficulty.mines}
+        />
+      </div>
 
     </div>
-  )
+  );
 }
 
 export default GenerateBoard;
