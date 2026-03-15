@@ -10,7 +10,8 @@ function randomizer(){
 return nums;
 
 }
-function testCase(){
+// this locates the boxes position to go over, i guess,   
+function BoxLocator(j){
   const hA = [0,1,2];
   const hB = [3,4,5];
   const hC = [6,7,8];
@@ -18,11 +19,38 @@ function testCase(){
   const VA = [0,3,6];
   const VB = [1,4,7];
   const VC = [2,5,8];
-  for(let i = 0;i>=hA.length;i++){
-    for(let j=0;j>=hA.length;j++){
-        
+  const arrA = [hA,hB,hC,VA,VB,VC];
+  const result = [];
+  for(let i=0;i<arrA.length;i++){
+    if(arrA[i].includes(j)){
+      result.push(arrA[i]);
     }
   }
+  return result;
+}
+function repeater(arr){
+  const arrT = [1,2,3,4,5,6,7,8,9];
+    for(let i=0;i<=arr.length;i++){
+      for(let j= 0;j<=arr.length;j++){
+        const arrB = arr[i][j];
+
+      }
+    }
+    const arrC = arrB.sort((a,b) => (a-b));
+    if(arrC == arrT){
+      return true;
+    }
+  }
+function testCase(j){
+  const hA = [0,1,2];
+  const hB = [3,4,5];
+  const hC = [6,7,8];
+
+  const VA = [0,3,6];
+  const VB = [1,4,7];
+  const VC = [2,5,8];
+  const arrA = [hA,hB,hC,VA,VB,VC];
+  repeater();
 }
 
 function rules(){
@@ -59,16 +87,21 @@ function Boxes({numeros}){
 
     )
 }
-function BoxLocator(j,mainArr){
-  for(let i = 0;i<mainArr.length;i++){
-    if(mainArr[i].includes(j)){
-      return i;
-    }
-  }
-}
+  // function BoxLocator(j,mainArr){
+  //   for(let i = 0;i<mainArr.length;i++){
+  //     if(mainArr[i].includes(j)){
+  //       return i;
+  //     }
+  //   }
+  // }
+
+
 
 function Board(){
     const  boxesData = Array.from({length:9},()=>randomizer());
+    const dat = BoxLocator(8);
+    const live = repeater(dat);
+    
 
   return(
     <>
@@ -79,10 +112,11 @@ function Board(){
       ))}
     
   </div>
-     
-    </div>
+  {dat}
+  {live}
+      </div>
   </>
-  )}
-
+  )
+}
 
 export default Board;
