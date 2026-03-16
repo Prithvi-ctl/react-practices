@@ -1,6 +1,8 @@
 import {useState,useEffect} from 'react';
 
-
+function arraysEqual(a,b){
+return a.length === b.length && a.every((v,i) => v == b[i]);
+}
 function randomizer(){
   const nums = [1,2,3,4,5,6,7,8,9];
   for(let i= nums.length-1;i>  0;i--){
@@ -10,7 +12,7 @@ function randomizer(){
 return nums;
 
 }
-// this locates the boxes position to go over, i guess,   
+
 function BoxLocator(j){
   const hA = [0,1,2];
   const hB = [3,4,5];
@@ -28,46 +30,39 @@ function BoxLocator(j){
   }
   return result;
 }
-function repeater(arr){
+
+function repeater(arr,mainArr){
+    
   const arrT = [1,2,3,4,5,6,7,8,9];
-    for(let i=0;i<=arr.length;i++){
-      for(let j= 0;j<=arr.length;j++){
-        const arrB = arr[i][j];
+  let arrE =[];
+  let arrG = [];
+    for(let i=0;i<arr.length;i++){
+        arrE = [];
+      for(let j= 0;j<arr[i].length;j++){
+          const n = arr[i][j];
+          
+          console.log(n);
+        for(let z = 0;z<3;z++){
+             arrE.push(mainArr[n][z]);
+            
+        }
+        
 
+    
       }
+        console.log(arrE)
+       let arrC = arrE.sort((a,b) => (a-b));
+       console.log("helo")
+       console.log(arrC)
+       
+    if(arraysEqual(arrT,arrC)){
+      arrG.push('true')
     }
-    const arrC = arrB.sort((a,b) => (a-b));
-    if(arrC == arrT){
-      return true;
-    }
+      else{
+          arrG.push('false');
+      }
   }
-function testCase(j){
-  const hA = [0,1,2];
-  const hB = [3,4,5];
-  const hC = [6,7,8];
-
-  const VA = [0,3,6];
-  const VB = [1,4,7];
-  const VC = [2,5,8];
-  const arrA = [hA,hB,hC,VA,VB,VC];
-  repeater();
-}
-
-function rules(){
-  const hA = [0,1,2];
-  const hB = [3,4,5];
-  const hC = [6,7,8];
-
-  const VA = [0,3,6];
-  const VB = [1,4,7];
-  const VC = [2,5,8];
-
-//from every data i.e data from for each [hA][hA] we collect the row , i.e from every [0] => [1][2] , we collet and collet and then compare i guess, and with that we can loop over everything and loop 
-//it and prevent everything from recurring, i guess, but i don't think i can do that, thou, cause it only works for the first one, so i need to identify which box it actually resides in, and which 
-//column it's currently residing in, 
-//so how do i find it out??  we are already keeping everything neat, i think, so let's imagine for every one we need to do it, we already have it let's say, 
-//let's do it no matter what,
-
+  return arrG;
 }
 
 function Boxes({numeros}){
@@ -87,21 +82,16 @@ function Boxes({numeros}){
 
     )
 }
-  // function BoxLocator(j,mainArr){
-  //   for(let i = 0;i<mainArr.length;i++){
-  //     if(mainArr[i].includes(j)){
-  //       return i;
-  //     }
-  //   }
-  // }
+
 
 
 
 function Board(){
+  
     const  boxesData = Array.from({length:9},()=>randomizer());
     const dat = BoxLocator(8);
-    const live = repeater(dat);
     
+    console.log(boxesData);
 
   return(
     <>
@@ -112,8 +102,9 @@ function Board(){
       ))}
     
   </div>
-  {dat}
-  {live}
+  
+  {dut};
+  
       </div>
   </>
   )
