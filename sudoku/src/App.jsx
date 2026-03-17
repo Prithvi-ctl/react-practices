@@ -16,8 +16,11 @@ return nums;
 }
 
 const EBoard = Array.from({length:9},()=>
-Array.from({length:9},()=>0)
-);
+Array.from({length:9},()=>({
+  value :0,
+  isFilled:false
+})
+));
 
 function BoxLocator(j){
   const hA = [0,1,2];
@@ -77,7 +80,7 @@ function Boxes({numeros}){
        {numeros.map((num,i) =>(
         <div key={i} index={i}
         className="w-24 h-24 border-2 border-black flex justify-center items-center text-4xl">
-          {num}
+          {num.value}
           </div>
           
        ))}
@@ -90,9 +93,11 @@ function Boxes({numeros}){
 }
 
 function Board(){
-  
+    
+  const result = Placer({i:2, j:4, value:1, mainArr:EBoard});
+  const hel = "hello";
     const  boxesData = Array.from({length:9},()=>randomizer());
-    const dat = BoxLocator(8);
+    
     
     console.log(boxesData);
 
@@ -106,11 +111,33 @@ function Board(){
     
   </div>
   
-  
-  
+        {String(result)}  ; 
       </div>
   </>
   )
 }
+function Placer({i,j,value,mainArr}){
+  const row = Math.floor(i/3)*3 + Math.floor(j/3); //so basically which row it locates to and which col it's in, that's it,  
+  const col = Math.floor(i%3)*3+(j%3);  // same dividing or should i say converting the box coords to global coords,
+  
+  for(let c = 0;c< 9;c++){ // here we are doing the same thing, keeping the row the same , we are , going from 0 - 9 and collecting things 
+    const box = Math.floor(row/3)*3 + Math.floor(col/3); 
+    const cell = (row%3) * 3  + (c%3);
+    if(mainArr[box][cell].value === value && c !=col){
+      return false;
+    }
+  }
+  for(let d = 0;d<9;d++){
+    const box = Math.floor(row/3)*3+Math.floor(col/3);
+    const cell = (d%3)*3+(col%3);
+    if(mainArr[box][cell].value === value && d !== row){
+      return false;
+    }
+  }
+  return true;
+}
+  
+			
+		
 
 export default Board;
