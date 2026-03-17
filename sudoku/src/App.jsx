@@ -1,5 +1,7 @@
 import {useState,useEffect} from 'react';
 
+
+
 function arraysEqual(a,b){
 return a.length === b.length && a.every((v,i) => v == b[i]);
 }
@@ -12,6 +14,10 @@ function randomizer(){
 return nums;
 
 }
+
+const EBoard = Array.from({length:9},()=>
+Array.from({length:9},()=>0)
+);
 
 function BoxLocator(j){
   const hA = [0,1,2];
@@ -83,9 +89,6 @@ function Boxes({numeros}){
     )
 }
 
-
-
-
 function Board(){
   
     const  boxesData = Array.from({length:9},()=>randomizer());
@@ -97,13 +100,13 @@ function Board(){
     <>
     <div className="flex justify-center items-center h-screen">
   <div className="grid grid-cols-3 gap-0 w-fit">
-      {boxesData.map((numeros,i) =>(
+      {EBoard.map((numeros,i) =>(
         <Boxes key={i} index={i} numeros={numeros}/>
       ))}
     
   </div>
   
-  {dut};
+  
   
       </div>
   </>
