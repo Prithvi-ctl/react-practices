@@ -15,12 +15,7 @@ return nums;
 
 }
 
-const EBoard = Array.from({length:9},()=>
-Array.from({length:9},()=>({
-  value :0,
-  isFilled:false
-})
-));
+
 
 function BoxLocator(j){
   const hA = [0,1,2];
@@ -40,7 +35,7 @@ function BoxLocator(j){
   return result;
 }
 
-function repeater(arr,mainArr){
+function repeater(arr,mainArr){ 
     
   const arrT = [1,2,3,4,5,6,7,8,9];
   let arrE =[];
@@ -94,26 +89,38 @@ function Boxes({numeros}){
 function numberGenerator(E){
 for(let i =0; i<9;i++){
 for(let j = 0;j<9;j++){
-let d =Math.floor(Math.random()*9);
+  let attempts = 0;
+  let placed = false;
+  while(attempts < 20){
+let d =Math.floor(Math.random()*9)+1;
 if(Placer({i:i ,j:j ,value:d ,mainArr:E})){
-		mainArr[i][j] = d;
+		E[i][j].value = d;
+    placed = true;
+    break;
 	}
-	else{
-		j--;
-	}
+  attempts++;
+}
+  if(!placed){
+    return numberGenerator(Array.from({length:9},()=>
+    Array.from({length:9},() => ({value:0,
+      isFilled:false
+    }))
+  )
+);
+  }
 }
 }
+return E;
 }
 
 function Board(){
+  const EBoard = Array.from({length:9},()=>
+Array.from({length:9},()=>({
+  value :0,
+  isFilled:false
+})
+));
   const nums = numberGenerator(EBoard);
-  const result = Placer({i:2, j:4, value:1, mainArr:EBoard});
-  const hel = "hello";
-    const  boxesData = Array.from({length:9},()=>randomizer());
-    
-    
-    console.log(boxesData);
-
   return(
     <>
     <div className="flex justify-center items-center h-screen">
@@ -124,7 +131,7 @@ function Board(){
     
   </div>
   
-        {String(result)}  ; 
+        
       </div>
   </>
   )
@@ -134,23 +141,45 @@ function Placer({i,j,value,mainArr}){ //basically converts box coords to global 
   const col = Math.floor(i%3)*3+(j%3);  // same dividing or should i say converting the box coords to global coords,
   
   for(let c = 0;c< 9;c++){ // here we are doing the same thing, keeping the row the same , we are , going from 0 - 9 and collecting things 
-    const box = Math.floor(row/3)*3 + Math.floor(col/3); 
-    const cell = (row%3) * 3  + (c%3);
-    if(mainArr[box][cell].value === value && c !=col){
+    const r = row;
+    const c2 = c;
+
+    const box = Math.floor(r/3)*3 + Math.floor(c2/3); 
+    const cell = (r%3) * 3  + (c2%3);
+    if(mainArr[box][cell].value === value && c2 !== col){
       return false;
     }
   }
   for(let d = 0;d<9;d++){
-    const box = Math.floor(row/3)*3+Math.floor(col/3);
-    const cell = (d%3)*3+(col%3);
+    const r = d;
+    const c2 = col;
+
+    const box = Math.floor(r/3)*3+Math.floor(c2/3);
+    const cell = (r%3)*3+(c2%3);
     if(mainArr[box][cell].value === value && d !== row){
       return false;
     }
   }
+const startRow = Math.floor(row/3)*3;
+const startCol = Math.floor(col/3)*3;
+  for(let r = 0; r<3;r++){
+    for(let c= 0;c<3;c++){
+      const rr =startRow+r;
+      const cc =startCol+c;
+
+      const box = Math.floor(rr/3)*3 + Math.floor(cc/3);
+      const cell = rr%3*3 + cc%3;
+
+      if(mainArr[box][cell].value === value){
+        return false;
+      }
+    }
+  }
+  
   return true;
 }
   
-			
+  
 		
 
 export default Board;
