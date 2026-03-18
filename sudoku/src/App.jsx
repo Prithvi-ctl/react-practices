@@ -91,9 +91,22 @@ function Boxes({numeros}){
 
     )
 }
+function numberGenerator(E){
+for(let i =0; i<9;i++){
+for(let j = 0;j<9;j++){
+let d =Math.floor(Math.random()*9);
+if(Placer({i:i ,j:j ,value:d ,mainArr:E})){
+		mainArr[i][j] = d;
+	}
+	else{
+		j--;
+	}
+}
+}
+}
 
 function Board(){
-    
+  const nums = numberGenerator(EBoard);
   const result = Placer({i:2, j:4, value:1, mainArr:EBoard});
   const hel = "hello";
     const  boxesData = Array.from({length:9},()=>randomizer());
@@ -105,7 +118,7 @@ function Board(){
     <>
     <div className="flex justify-center items-center h-screen">
   <div className="grid grid-cols-3 gap-0 w-fit">
-      {EBoard.map((numeros,i) =>(
+      {nums.map((numeros,i) =>(
         <Boxes key={i} index={i} numeros={numeros}/>
       ))}
     
@@ -116,7 +129,7 @@ function Board(){
   </>
   )
 }
-function Placer({i,j,value,mainArr}){
+function Placer({i,j,value,mainArr}){ //basically converts box coords to global rows and cols
   const row = Math.floor(i/3)*3 + Math.floor(j/3); //so basically which row it locates to and which col it's in, that's it,  
   const col = Math.floor(i%3)*3+(j%3);  // same dividing or should i say converting the box coords to global coords,
   
@@ -141,3 +154,4 @@ function Placer({i,j,value,mainArr}){
 		
 
 export default Board;
+
