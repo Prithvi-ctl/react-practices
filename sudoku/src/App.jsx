@@ -69,13 +69,17 @@ function repeater(arr,mainArr){
   return arrG;
 }
 
-function Boxes({numeros}){
+function Boxes({numeros,rowIndex,board,setBoard}){
     return(
       <div className="grid grid-cols-3 w-fit">
        {numeros.map((num,i) =>(
         <div key={i} index={i}
-        className="w-24 h-24 border-2 border-black flex justify-center items-center text-4xl">
-          {num.value}
+        className="w-24 h-24 border-2 border-black flex justify-center items-center text-4xl cursor-pointer " onClick={() =>{
+          const newBoard = board.map(r => r.map(c =>({...c})));
+          newBoard[rowIndex][i].isRevealed = true;
+          setBoard(newBoard);
+        }}>
+         {num.isRevealed? num.value : " "}
           </div>
           
        ))}
@@ -102,8 +106,8 @@ if(Placer({i:i ,j:j ,value:d ,mainArr:E})){
 }
   if(!placed){
     return numberGenerator(Array.from({length:9},()=>
-    Array.from({length:9},() => ({value:0,
-      isFilled:false
+    Array.from({length:9},() => ({
+      value:0, isRevealed:false
     }))
   )
 );
@@ -112,21 +116,34 @@ if(Placer({i:i ,j:j ,value:d ,mainArr:E})){
 }
 return E;
 }
-
+function reveal(i,j,board){
+  const newBoard = board.map(row => row.map(cell=>({...cell})));
+  newBoard[i][j].isRevealed = true;
+  setBoard(newBoard);
+};  
 function Board(){
+  
   const EBoard = Array.from({length:9},()=>
 Array.from({length:9},()=>({
   value :0,
-  isFilled:false
+  isRevealed:false
 })
 ));
-  const nums = numberGenerator(EBoard);
+  
+  const [board,setBoard] = useState(() => {
+    const EBoard = Array.from({length:9},()=>
+Array.from({length:9},()=>({
+  value :0,
+  isRevealed:false
+})
+));
+ return numberGenerator(EBoard) });
   return(
     <>
     <div className="flex justify-center items-center h-screen">
   <div className="grid grid-cols-3 gap-0 w-fit">
-      {nums.map((numeros,i) =>(
-        <Boxes key={i} index={i} numeros={numeros}/>
+      {board.map((numeros,i) =>(
+        <Boxes key={i} index={i} rowIndex = {i} numeros={numeros} board = {board} setBoard={setBoard}/>
       ))}
     
   </div>
