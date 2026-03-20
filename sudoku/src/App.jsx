@@ -5,6 +5,23 @@ import {useState,useEffect} from 'react';
 function arraysEqual(a,b){
 return a.length === b.length && a.every((v,i) => v == b[i]);
 }
+function ret(nums){
+  console.log(nums)
+  return nums;
+}
+
+function Buttons(){
+return(
+  <div className="flex justify-center grid grid-cols-3">
+    {Array.from({length:9},(_,i)=>(
+        <button key={i} className="px-6 py-6 bg-gray-300 backdrop-blur-md text-black border border-black/20 rounded-lg hover:bg-black/20 active:scale-90 transition transform" onClick={()=>ret(i+1)}   >
+          {i+1}</button>
+
+      
+    ))}
+  </div>
+)
+}
 function randomizer(){
   const nums = [1,2,3,4,5,6,7,8,9];
   for(let i= nums.length-1;i>  0;i--){
@@ -86,7 +103,7 @@ function Boxes({numeros,rowIndex,board,setBoard}){
        
       </div>
       
-
+       
 
     )
 }
@@ -147,7 +164,7 @@ Array.from({length:9},()=>({
       ))}
     
   </div>
-  
+  <Buttons/>
         
       </div>
   </>
@@ -200,4 +217,3 @@ const startCol = Math.floor(col/3)*3;
 		
 
 export default Board;
-
