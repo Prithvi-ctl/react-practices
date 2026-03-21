@@ -10,7 +10,8 @@ function ret(nums){
   return nums;
 }
 
-function Buttons({selected,board,setBoard}){
+function Buttons({selected,board,setBoard,solution}){
+
   function placeNumber(num){
     if(!selected) return;
 
@@ -18,8 +19,12 @@ function Buttons({selected,board,setBoard}){
     const {row,col} = selected;
 
     if(newBoard[row][col].isRevealed) return;
+    
+      newBoard[row][col].value = num;
+      newBoard[row][col].isCorrect = num === solution[row][col].value;
 
-    newBoard[row][col].value  = num;
+    
+    
     setBoard(newBoard);
   }
 return(
@@ -97,7 +102,7 @@ function repeater(arr,mainArr){
   return arrG;
 }
 
-function Boxes({numeros,rowIndex,selected,board,setSelected}){
+function Boxes({numeros,rowIndex,selected,setSelected}){
     return(
       <div className="grid grid-cols-3 w-fit">
        {numeros.map((num,i) =>(
@@ -105,13 +110,18 @@ function Boxes({numeros,rowIndex,selected,board,setSelected}){
           key={i}
           className={`w-24 h-24 px-6 py-6 border-2 border-black flex justify-center items-center text-4xl cursor-pointer
             ${selected && selected.row === rowIndex && selected.col === i
-              ? "border-blue-700"
+              ? "bg-blue-700"
               : ""
+            }
+            ${
+              num.isRevealed?  "text-black": 
+              num.isCorrect === true? "text-green-600":
+              num.isCorrect === false? "text-red-700":"text-blue-600"
             }
           `}
           onClick={() => select(rowIndex, i, setSelected)}
         >
-         {num.isRevealed ? num.value : ""}
+         {num.value}
           </div>
           
        ))}
@@ -156,7 +166,7 @@ function reveal(i,j,board){
   function Board(){
     const [solution,setSoln] = useState([])
     const [board,setBoard] = useState([]);
-    const [selected,setSelected] = useState([]);
+    const [selected,setSelected] = useState(null);
     
   function generateGame(){
      const EBoard = Array.from({length:9},()=>
@@ -185,13 +195,13 @@ function reveal(i,j,board){
   return(
       <>
       <div className="flex justify-center items-center h-screen">
-    <div className="grid grid-cols-3 gap-0 w-fit">
+    <div className="grid grid-cols-3 gap-1 w-fit">
         {board.map((numeros,i) =>(
           <Boxes key={i} index={i} rowIndex = {i} numeros={numeros} board = {board} selected={selected} setBoard={setBoard} setSelected={setSelected}/>
         ))}
       
     </div>
-    <Buttons selected={selected} board={board} setBoard={setBoard}/>
+    <Buttons selected={selected} board={board} setBoard={setBoard} solution={solution}/>
         
         </div>
     </>
