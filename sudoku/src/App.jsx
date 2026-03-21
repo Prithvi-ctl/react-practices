@@ -6,15 +6,26 @@ function arraysEqual(a,b){
 return a.length === b.length && a.every((v,i) => v == b[i]);
 }
 function ret(nums){
-  console.log(nums)
+  
   return nums;
 }
 
-function Buttons(){
+function Buttons({selected,board,setBoard}){
+  function placeNumber(num){
+    if(!selected) return;
+
+    const newBoard = board.map(row=>row.map(cell => ({...cell})));
+    const {row,col} = selected;
+
+    if(newBoard[row][col].isRevealed) return;
+
+    newBoard[row][col].value  = num;
+    setBoard(newBoard);
+  }
 return(
   <div className="flex justify-center grid grid-cols-3">
     {Array.from({length:9},(_,i)=>(
-        <button key={i} className="px-6 py-6 bg-gray-300 backdrop-blur-md text-black border border-black/20 rounded-lg hover:bg-black/20 active:scale-90 transition transform" onClick={()=>ret(i+1)}   >
+        <button key={i} className="px-6 py-6 bg-gray-300 backdrop-blur-md text-black border border-black/20 rounded-lg hover:bg-black/20 active:scale-90 transition transform" onClick={()=>placeNumber(i+1)}   >
           {i+1}</button>
 
       
@@ -86,17 +97,21 @@ function repeater(arr,mainArr){
   return arrG;
 }
 
-function Boxes({numeros,rowIndex,board,setBoard}){
+function Boxes({numeros,rowIndex,selected,board,setSelected}){
     return(
       <div className="grid grid-cols-3 w-fit">
        {numeros.map((num,i) =>(
-        <div key={i} index={i}
-        className="w-24 h-24 border-2 border-black flex justify-center items-center text-4xl cursor-pointer " onClick={() =>{
-          const newBoard = board.map(r => r.map(c =>({...c})));
-          newBoard[rowIndex][i].isRevealed = true;
-          setBoard(newBoard);
-        }}>
-         {num.isRevealed? num.value : " "}
+        <div 
+          key={i}
+          className={`w-24 h-24 px-6 py-6 border-2 border-black flex justify-center items-center text-4xl cursor-pointer
+            ${selected && selected.row === rowIndex && selected.col === i
+              ? "border-blue-700"
+              : ""
+            }
+          `}
+          onClick={() => select(rowIndex, i, setSelected)}
+        >
+         {num.isRevealed ? num.value : ""}
           </div>
           
        ))}
@@ -138,38 +153,50 @@ function reveal(i,j,board){
   newBoard[i][j].isRevealed = true;
   setBoard(newBoard);
 };  
-function Board(){
-  
-  const EBoard = Array.from({length:9},()=>
-Array.from({length:9},()=>({
-  value :0,
-  isRevealed:false
-})
-));
-  
-  const [board,setBoard] = useState(() => {
-    const EBoard = Array.from({length:9},()=>
-Array.from({length:9},()=>({
-  value :0,
-  isRevealed:false
-})
-));
- return numberGenerator(EBoard) });
-  return(
-    <>
-    <div className="flex justify-center items-center h-screen">
-  <div className="grid grid-cols-3 gap-0 w-fit">
-      {board.map((numeros,i) =>(
-        <Boxes key={i} index={i} rowIndex = {i} numeros={numeros} board = {board} setBoard={setBoard}/>
-      ))}
+  function Board(){
+    const [solution,setSoln] = useState([])
+    const [board,setBoard] = useState([]);
+    const [selected,setSelected] = useState([]);
     
-  </div>
-  <Buttons/>
-        
-      </div>
-  </>
+  function generateGame(){
+     const EBoard = Array.from({length:9},()=>
+  Array.from({length:9},()=>({
+    value :0,
+    isRevealed:false
+  })
+  ));
+
+  const solved = numberGenerator(EBoard);
+  setSoln(solved);
+
+  const player = solved.map(row => 
+    row.map(num =>{
+      const reveal  = Math.random() > 0.5;
+      return{
+      value:reveal?num.value:"",
+      isRevealed:reveal,
+    }})
   )
-}
+  setBoard(player);
+  }
+    useEffect(()=>{
+    generateGame();
+  },[]);
+  return(
+      <>
+      <div className="flex justify-center items-center h-screen">
+    <div className="grid grid-cols-3 gap-0 w-fit">
+        {board.map((numeros,i) =>(
+          <Boxes key={i} index={i} rowIndex = {i} numeros={numeros} board = {board} selected={selected} setBoard={setBoard} setSelected={setSelected}/>
+        ))}
+      
+    </div>
+    <Buttons selected={selected} board={board} setBoard={setBoard}/>
+        
+        </div>
+    </>
+    )
+  }
 function Placer({i,j,value,mainArr}){ //basically converts box coords to global rows and cols
   const row = Math.floor(i/3)*3 + Math.floor(j/3); //so basically which row it locates to and which col it's in, that's it,  
   const col = Math.floor(i%3)*3+(j%3);  // same dividing or should i say converting the box coords to global coords,
@@ -212,8 +239,13 @@ const startCol = Math.floor(col/3)*3;
   
   return true;
 }
+
+function select(i, j, setSelected) {
+  setSelected({ row: i, col: j });
+}
+
+
   
-  
-		
+
 
 export default Board;
